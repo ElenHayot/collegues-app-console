@@ -1,7 +1,7 @@
-var lg = console.log;
+let lg = console.log;
 lg("** Administration Collegues **");
 
-var moduleRep = require('./presentation');
+let moduleRep = require('./presentation');
 
 
 moduleRep.playMenu();

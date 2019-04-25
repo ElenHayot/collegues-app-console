@@ -1,28 +1,20 @@
-var request = require('request');
+//this (request) is an object
+let request = require('request-promise-native');
 
-function findCollegueByName(nameToFind, callback){
 
-    request('https://hayot-collegues-api.herokuapp.com/collegues?name='+nameToFind, {json:true}, function(err, res, body){
-        
-    if(res.statusCode >= 400 && res.statusCode < 600) {
-        //send error if no match
-        var errorMessage = res.body;
-        callback([], errorMessage);
-    } else {
-        //first request result
-        colleguesFoundArray = body;
-    
-        colleguesFoundArray.forEach(function(matricule){
-            request('https://hayot-collegues-api.herokuapp.com/collegues/'+ matricule, {json:true}, function(err, res, body){
-                var colleguesIdentityList = body;
-    
-            callback(colleguesIdentityList);    
+module.exports = class Service{
+
+    findCollegueByName(nameToFind) {
+
+        return request(`https://hayot-collegues-api.herokuapp.com/collegues?name=${nameToFind}`, { json: true })
+            .then(tabMatricules => {
+                const tabPromise = tabMatricules.map(matricule => request(`https://hayot-collegues-api.herokuapp.com/collegues/${matricule}`, {
+                    json: true
+                }));
+                //sends a promise that contains a tab of promises
+                return Promise.all(tabPromise);
             });
-        });
+   
     }
 
-    });
-    
 }
-
-exports.findCollegueByName = findCollegueByName;
